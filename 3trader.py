@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 # تنظیمات کلی
 SYMBOL = "XAUUSD-VIP"
-TIMEFRAME = mt5.TIMEFRAME_M30
+TIMEFRAME = mt5.TIMEFRAME_M15
 N_REQUIRED = 15  # حداقل تعداد کندل مورد نیاز
 TP_COEF = 0.9   # ضریب محافظه‌کارانه برای TP
 SL_BUFFER = 1.1 # فاصله احتیاطی برای SL
@@ -67,13 +67,13 @@ def calculate_tp_sl(pred_prices, current_price):
     if np.mean(diffs) > 0:
         direction = "buy"
         avg_increase = np.mean(positive_diffs) if len(positive_diffs) > 0 else 0.001
-        tp = current_price + min((avg_increase * TP_COEF), 9)
-        sl = current_price - min((avg_increase * TP_COEF * 3/4), 2)
+        tp = current_price + min((avg_increase * TP_COEF), 5.5)
+        sl = current_price - min((avg_increase * TP_COEF * 3/4), 1)
     else:
         direction = "sell"
         avg_decrease = np.mean(negative_diffs) if len(negative_diffs) > 0 else 0.001
-        tp = current_price - min((avg_decrease * TP_COEF), 9)
-        sl = current_price + min((avg_decrease * TP_COEF * 3/4), 2)
+        tp = current_price - min((avg_decrease * TP_COEF), 5.5)
+        sl = current_price + min((avg_decrease * TP_COEF * 3/4), 1)
 
     return direction, tp, sl
 def get_position(symbol):
@@ -196,13 +196,13 @@ if __name__ == "__main__":
             if last_dir == prev_dir == 'buy':
                 return True
             print('[Buy] Not strong enough')
-            return last_dir == 'buy' and last_body > prev_body
+            return last_dir == 'buy' and last_body > 1
 
         elif direction == 'sell':
             if last_dir == prev_dir == 'sell':
                 return True
             print('[Sell] Not strong enough')
-            return last_dir == 'sell' and last_body > prev_body
+            return last_dir == 'sell' and last_body > 1
 
         # اگر ورودی اشتباه باشد
         print('[Error] Invalid direction input')

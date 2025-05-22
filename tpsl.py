@@ -4,7 +4,7 @@ import time
 # تنظیمات
 SYMBOL = "XAUUSD-VIP"
 CHECK_INTERVAL = 2  # ثانیه
-PRICE_UNIT = 1.5    # یک دلار
+PRICE_UNIT = 1    # یک دلار
 DEBUG = True
 
 # اتصال به متاتریدر
@@ -33,7 +33,7 @@ while True:
 
         # محاسبه 1/4 مسیر تا TP
         tp_distance = abs(tp - entry)
-        quarter_tp = entry + 0.05 * tp_distance if is_buy else entry - 0.05 * tp_distance
+        quarter_tp = entry + 0.25 * tp_distance if is_buy else entry - 0.25 * tp_distance
 
         if DEBUG:
             print(f"📈 قیمت: {price:.2f} | ورود: {entry:.2f} | TP: {tp:.2f} | SL فعلی: {sl:.2f} | ¼ TP: {quarter_tp:.2f}")
@@ -48,7 +48,7 @@ while True:
         move_from_qtp = abs(price - quarter_tp)
         units_moved = int(move_from_qtp // PRICE_UNIT)
 
-        new_sl = quarter_tp + units_moved * PRICE_UNIT if is_buy else quarter_tp - units_moved * PRICE_UNIT
+        new_sl = price - units_moved
         if units_moved == 0:
             new_sl = quarter_tp
 
