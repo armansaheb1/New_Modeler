@@ -8,7 +8,7 @@ from ta import add_all_ta_features
 from datetime import datetime, timedelta
 from time import gmtime, strftime, mktime
 # تنظیمات کلی
-SYMBOL = "XAUUSD-VIP"
+SYMBOL = "XAUUSD-I"
 TIMEFRAME = mt5.TIMEFRAME_M30
 N_REQUIRED = 15  # حداقل تعداد کندل مورد نیاز
 TP_COEF = 0.9   # ضریب محافظه‌کارانه برای TP

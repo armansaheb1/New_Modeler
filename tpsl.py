@@ -2,7 +2,7 @@ import MetaTrader5 as mt5
 import time
 
 # تنظیمات
-SYMBOL = "XAUUSD-VIP"
+SYMBOL = "XAUUSD-I"
 CHECK_INTERVAL = 2  # ثانیه
 DEBUG = True
 
@@ -38,14 +38,15 @@ while True:
         # محاسبه مسیر و ¼ آن
         tp_distance = abs(tp - entry)
         quarter_distance = tp_distance * 0.15
-        quarter_distance2 = tp_distance * 0.08
         quarter_tp = entry + quarter_distance if is_buy else entry - quarter_distance
+        quarter_distance2 = tp_distance * 0.05
+        quarter_tp2 = entry + quarter_distance2 if is_buy else entry - quarter_distance2
 
         if DEBUG:
             print(f"📈 قیمت: {price:.2f} | ورود: {entry:.2f} | TP: {tp:.2f} | SL فعلی: {sl:.2f} | ¼ TP: {quarter_tp:.2f}")
 
         # اگر قیمت هنوز به ¼ مسیر نرسیده
-        if (is_buy and price <= entry + quarter_distance2 if is_buy else entry - quarter_distance2) or (not is_buy and price >= entry + quarter_distance2 if is_buy else entry - quarter_distance2):
+        if (is_buy and price <= quarter_tp2) or (not is_buy and price >= quarter_tp2):
             if DEBUG:
                 print("⏳ هنوز به ¼ مسیر نرسیده‌ایم.")
             continue
