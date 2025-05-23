@@ -13,7 +13,7 @@ TIMEFRAME = mt5.TIMEFRAME_M30
 N_REQUIRED = 15  # حداقل تعداد کندل مورد نیاز
 TP_COEF = 0.9   # ضریب محافظه‌کارانه برای TP
 SL_BUFFER = 1.1 # فاصله احتیاطی برای SL
-VOLUME_RATIO = 0.0003  # حجم معامله نسبت به موجودی (یک پنج هزارم)
+VOLUME_RATIO = 0.0004  # حجم معامله نسبت به موجودی (یک پنج هزارم)
 
 # مدل LSTM (مثل مدل شما)
 class LSTMModel(nn.Module):
@@ -67,13 +67,13 @@ def calculate_tp_sl(pred_prices, current_price):
     if np.mean(diffs) > 0:
         direction = "buy"
         avg_increase = np.mean(positive_diffs) if len(positive_diffs) > 0 else 0.001
-        tp = current_price + min((avg_increase * TP_COEF), 5)
-        sl = current_price - min((avg_increase * TP_COEF * 3/4), 1.5)
+        tp = current_price + min((avg_increase * TP_COEF), 5.5)
+        sl = current_price - min((avg_increase * TP_COEF * 3/4), 1)
     else:
         direction = "sell"
         avg_decrease = np.mean(negative_diffs) if len(negative_diffs) > 0 else 0.001
-        tp = current_price - min((avg_decrease * TP_COEF), 5)
-        sl = current_price + min((avg_decrease * TP_COEF * 3/4), 1.5)
+        tp = current_price - min((avg_decrease * TP_COEF), 5.5)
+        sl = current_price + min((avg_decrease * TP_COEF * 3/4), 1)
 
     return direction, tp, sl
 def get_position(symbol):
@@ -127,7 +127,6 @@ if __name__ == "__main__":
         print(f"❌ تعداد کندل کافی دریافت نشد (کمتر از {N_REQUIRED} کندل)")
         mt5.shutdown()
         exit()
-    
 
     df_feat = enrich_features(df)
 
@@ -215,33 +214,12 @@ if __name__ == "__main__":
         end = datetime.fromtimestamp(mktime(gmtime())) + timedelta(days=30)
 
         deals = mt5.history_deals_get(start, end)
-        print(deals[-1])
         if deals[-1].profit < 0:
-            print("zian")
             last_loss_candle_time = deals[-1].time
-            print(last_loss_candle_time)
             current_candle_time = mt5.copy_rates_from_pos(SYMBOL, TIMEFRAME, 0, 1)[0]['time']
-            print(current_candle_time)
-            if current_candle_time <= last_loss_candle_time:
+            if current_candle_time == last_loss_candle_time:
                 print("⛔ در همان کندل ضررده هستیم، معامله باز نمی‌شود.")
                 return False
             return True
         else:
             return True
-        
-       
-
-    last_loss_dir = last_closed_loss_trade_direction(SYMBOL)
-    print(can_open_trade_this_candle())
-    if pos is not None:
-        print("❌ معامله باز موجود است، معامله جدید باز نمی‌شود.")
-    
-    elif last_loss_dir == direction:
-        if confirm_candle_strength(direction) and can_open_trade_this_candle():
-            place_order(direction, volume, tp, sl)
-        else:    
-            print(f"❌ آخرین معامله {direction} زیان‌ده بوده. منتظر معامله در جهت مخالف هستیم.")
-    else:
-        place_order(direction, volume, tp, sl)
-    
-    mt5.shutdown()
